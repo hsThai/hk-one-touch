@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>HKApp - Quản Lý Sửa Chữa</title>
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="HKApp" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <style>
+      /* Ngăn pull-to-refresh trên mobile */
+      html, body {
+        overscroll-behavior: none;
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+      }
+      #root {
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+    <script>
+      // Chặn F5, Ctrl+R refresh
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.ctrlKey && e.key === 'R')) {
+          e.preventDefault();
+          return false;
+        }
+        // Chặn Ctrl+W đóng tab
+        if (e.ctrlKey && (e.key === 'w' || e.key === 'W')) {
+          e.preventDefault();
+          return false;
+        }
+      });
+
+      // Chặn context menu (chuột phải)
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      });
+
+      // Wake Lock - ngăn màn hình tắt
+      async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+          try {
+            window._wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock active');
+            // Tự request lại khi tab active trở lại
+            document.addEventListener('visibilitychange', async () => {
+              if (document.visibilityState === 'visible' && window._wakeLock?.released) {
+                window._wakeLock = await navigator.wakeLock.request('screen');
+              }
+            });
+          } catch (e) {
+            console.log('Wake Lock not supported:', e);
+          }
+        }
+      }
+      requestWakeLock();
+
+      // Chặn back thoát app - push state liên tục
+      window.addEventListener('load', function() {
+        history.pushState(null, '', window.location.href);
+        window.addEventListener('popstate', function() {
+          history.pushState(null, '', window.location.href);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
