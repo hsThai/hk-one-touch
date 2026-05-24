@@ -138,8 +138,9 @@ export const AppSettings   = makeCollection("app_settings");
 export const Warehouse      = makeCollection("warehouses");
 export const StockLedger    = makeCollection("stock_ledgers");
 export const StockMovement  = makeCollection("stock_movements");
-export const StockImport    = makeCollection("stock_imports");
-export const StockImportItem= makeCollection("stock_import_items");
+export const StockImport       = makeCollection("stock_imports");
+export const StockImportItem   = makeCollection("stock_import_items");
+export const StockExportRequest= makeCollection("stock_export_requests");
 
 // ── File Upload ───────────────────────────────────────────
 export async function uploadFile(file) {
