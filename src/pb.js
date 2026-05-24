@@ -134,6 +134,11 @@ export const SparePart     = makeCollection("spare_parts");
 export const SparePartUsage= makeCollection("spare_part_usages");
 export const AppSettings   = makeCollection("app_settings");
 
+// ── Warehouse / Kho ───────────────────────────────────────
+export const Warehouse     = makeCollection("warehouses");
+export const StockLedger   = makeCollection("stock_ledgers");
+export const StockMovement = makeCollection("stock_movements");
+
 // ── File Upload ───────────────────────────────────────────
 export async function uploadFile(file) {
   const base = getPbUrl();
