@@ -5,6 +5,7 @@ import { uploadFile } from "./pb.js";
 
 import { QRScanModal, QRPrintModal, QRCanvas, getQRDataUrl, loadQRLib } from "./QRComponents";
 import { timeAgo, genOrderId, getKpiTimerInfo, MediaViewer, AcceptChecklistModal, AcceptTimer } from "./MediaViewer";
+import { PaymentModal } from "./PaymentModal";
 
 function OrderDrawer({ order, onClose, currentUser, onUpdate, users, onShowQR }) {
   const [chatInput, setChatInput] = useState("");
@@ -23,6 +24,7 @@ function OrderDrawer({ order, onClose, currentUser, onUpdate, users, onShowQR })
   const [checklistTarget, setChecklistTarget] = useState(null); // {ord, stage}
   const [editMode, setEditMode] = useState(false); // KTV phải bấm "Sửa" mới đổi trạng thái
   const [showSparePart, setShowSparePart] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [mediaViewer, setMediaViewer] = useState(null); // {items, startIndex}
   const chatRef = useRef();
 
@@ -564,6 +566,14 @@ function OrderDrawer({ order, onClose, currentUser, onUpdate, users, onShowQR })
             <button onClick={() => onShowQR(order)} style={{ width:"100%", height:52, borderRadius:14, background:"#1e1b4b", color:"#fff", border:"none", fontWeight:800, fontSize:16, cursor:"pointer" }}>
               🖨️ In Phiếu QR
             </button>
+            {/* Nút Thu tiền — chỉ hiện khi Hoàn Thành hoặc Đã thanh toán chưa xong */}
+            {(order.status === "Hoàn Thành" || order.status === "Đã thanh toán") && ["manager","receptionist"].includes(currentUser.role) && (
+              <button
+                onClick={() => setShowPayment(true)}
+                style={{ width:"100%", height:54, borderRadius:14, background:"#3730a3", color:"#fff", border:"none", fontWeight:800, fontSize:16, cursor:"pointer", marginTop:10, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                💰 Thu tiền đơn sửa
+              </button>
+            )}
             <div style={{ fontSize:12, color:"#9ca3af", textAlign:"center", marginTop:10 }}>QR chứa mã đơn: <strong>{qrContent}</strong></div>
           </div>
         )}
@@ -581,6 +591,14 @@ function OrderDrawer({ order, onClose, currentUser, onUpdate, users, onShowQR })
         items={mediaViewer.items}
         startIndex={mediaViewer.startIndex}
         onClose={() => setMediaViewer(null)}
+      />
+    )}
+    {showPayment && (
+      <PaymentModal
+        order={order}
+        currentUser={currentUser}
+        onClose={() => setShowPayment(false)}
+        onDone={() => { onUpdate && onUpdate(order.id, { status: "Đã thanh toán" }, null); }}
       />
     )}
     </>
