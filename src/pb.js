@@ -135,9 +135,11 @@ export const SparePartUsage= makeCollection("spare_part_usages");
 export const AppSettings   = makeCollection("app_settings");
 
 // ── Warehouse / Kho ───────────────────────────────────────
-export const Warehouse     = makeCollection("warehouses");
-export const StockLedger   = makeCollection("stock_ledgers");
-export const StockMovement = makeCollection("stock_movements");
+export const Warehouse      = makeCollection("warehouses");
+export const StockLedger    = makeCollection("stock_ledgers");
+export const StockMovement  = makeCollection("stock_movements");
+export const StockImport    = makeCollection("stock_imports");
+export const StockImportItem= makeCollection("stock_import_items");
 
 // ── File Upload ───────────────────────────────────────────
 export async function uploadFile(file) {

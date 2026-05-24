@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Warehouse } from "./pb.js";
 import { StockLedgerPage } from "./StockLedgerPage.jsx";
+import { StockImportPage } from "./StockImportPage.jsx";
 
 const PRIMARY   = "#3730a3";
 const LIGHT     = "#ede9fe";
@@ -125,7 +126,13 @@ export function WarehouseApp({ currentUser, onBack }) {
           />
         );
       case "import":
-        return <ComingSoon icon="📥" label="Nhập kho" />;
+        return (
+          <StockImportPage
+            currentUser={currentUser}
+            warehouseId={selectedWHId || ""}
+            warehouseName={selectedWHName}
+          />
+        );
       case "export":
         return <ComingSoon icon="📤" label="Xuất kho" />;
       case "transfer":
