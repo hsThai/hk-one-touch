@@ -108,10 +108,21 @@ export function WarehouseApp({ currentUser, onBack }) {
   // ── Load danh sách kho ─────────────────────────────────
   useEffect(() => {
     Warehouse.list({ filter: "is_active=true", limit: 100 })
-      .then(setWarehouses)
+      .then(all => {
+        const ids = currentUser?.warehouse_ids || [];
+        const allowed = ids.length > 0
+          ? all.filter(w => ids.includes(w.id))
+          : all;
+        setWarehouses(allowed);
+        // Auto-select nếu chỉ có 1 kho
+        if (allowed.length === 1) {
+          setSelectedWHId(allowed[0].id);
+          setSelectedWHName(allowed[0].name);
+        }
+      })
       .catch(() => setWarehouses([]))
       .finally(() => setLoadingWH(false));
-  }, []);
+  }, [currentUser]);
 
   // ── Low stock count cho badge ──────────────────────────
   // (sẽ được cập nhật từ StockLedgerPage qua prop nếu cần — hiện để 0)

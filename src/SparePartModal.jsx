@@ -10,6 +10,10 @@ import { SparePart, SparePartUsage, RepairChat, RepairOrder } from "./pb.js";
 //   onDone      — sau khi bấm "Sửa Xong" thành công
 
 export default function SparePartModal({ order, currentStaff, onClose, onDone }) {
+  // Null guards
+  const staffName = currentStaff?.full_name || "Nhân viên";
+  const staffId   = currentStaff?.id || "";
+  const staffRole = currentStaff?.role || "";
   const [parts, setParts]       = useState([]);   // danh sách SparePart
   const [usages, setUsages]     = useState([]);   // SparePartUsage của đơn này
   const [search, setSearch]     = useState("");
@@ -74,7 +78,7 @@ export default function SparePartModal({ order, currentStaff, onClose, onDone })
       `━━━━━━━━━━━━━━━━━━\n` +
       `📋 Đơn: ${order.order_code}\n` +
       `📱 Máy: ${order.device_model || order.device_name || "?"}\n` +
-      `🔧 KTV: ${currentStaff.full_name}\n` +
+      `🔧 KTV: ${staffName}\n` +
       `📦 LK: ${part.name}${part.sku ? ` (${part.sku})` : ""}\n` +
       `📊 SL: 1 ${part.unit || "cái"}\n` +
       (isExtra ? `⚠️ PHÁT SINH trong quá trình sửa\n` : "") +
@@ -96,17 +100,17 @@ export default function SparePartModal({ order, currentStaff, onClose, onDone })
     try {
       await SparePartUsage.update(usage.id, {
         status: "issued",
-        warehouse_confirmed_by: currentStaff.full_name,
+        warehouse_confirmed_by: staffName,
       });
-      setUsages(prev => prev.map(u => u.id===usage.id ? {...u, status:"issued", warehouse_confirmed_by: currentStaff.full_name} : u));
+      setUsages(prev => prev.map(u => u.id===usage.id ? {...u, status:"issued", warehouse_confirmed_by: staffName} : u));
       showToast("✅ Đã xác nhận xuất tạm");
 
       // Chat xác nhận
       await RepairChat.create({
         order_id:    order.id,
         order_code:  order.order_code,
-        sender_id:   currentStaff.id,
-        sender_name: `📦 ${currentStaff.full_name} (Kho)`,
+        sender_id:   staffId,
+        sender_name: `📦 ${staffName} (Kho)`,
         message:     `✅ Đã xuất tạm: ${usage.part_name} × ${usage.qty_requested} ${usage.unit || "cái"} cho KTV ${order.assigned_to_name || ""}`,
         message_type:"system",
       });
@@ -138,8 +142,8 @@ export default function SparePartModal({ order, currentStaff, onClose, onDone })
       await RepairChat.create({
         order_id:    order.id,
         order_code:  order.order_code,
-        sender_id:   currentStaff.id,
-        sender_name: `🔧 ${currentStaff.full_name} (KTV)`,
+        sender_id:   staffId,
+        sender_name: `🔧 ${staffName} (KTV)`,
         message:     `↩️ Trả linh kiện: ${usage.part_name} × ${actualQtyReturn}\nCòn dùng: ${qtyUsed} | Tính tiền: ${(qtyUsed * usage.unit_price).toLocaleString()}đ`,
         message_type:"system",
       });
@@ -181,8 +185,8 @@ export default function SparePartModal({ order, currentStaff, onClose, onDone })
       await RepairChat.create({
         order_id:    order.id,
         order_code:  order.order_code,
-        sender_id:   currentStaff.id,
-        sender_name: `🔧 ${currentStaff.full_name}`,
+        sender_id:   staffId,
+        sender_name: `🔧 ${staffName}`,
         message:     `✅ SỬA XONG!\nLinh kiện đã dùng: ${activeUsages.length} loại\nTổng LK: ${partCost.toLocaleString()}đ\nCông sửa: ${(order.estimated_cost||0).toLocaleString()}đ\nTổng bill dự kiến: ${finalCost.toLocaleString()}đ\n\n📡 KiotViet sẽ tự trừ kho khi đồng bộ.`,
         message_type:"system",
       });
@@ -337,7 +341,7 @@ export default function SparePartModal({ order, currentStaff, onClose, onDone })
                         {/* Action buttons */}
                         {u.status !== "finalized" && u.status !== "returned" && (
                           <div style={{ display:"flex", gap:8, marginTop:10 }}>
-                            {u.status === "pending" && currentStaff.role === "warehouse" && (
+                            {u.status === "pending" && staffRole === "warehouse" && (
                               <button onClick={() => confirmIssued(u)}
                                 style={{ flex:1, height:36, borderRadius:10, border:"none", background:"#ecfdf5", color:"#065f46", fontWeight:700, fontSize:13, cursor:"pointer" }}>
                                 ✅ Xác nhận xuất tạm

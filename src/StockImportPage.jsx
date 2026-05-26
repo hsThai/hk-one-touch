@@ -567,6 +567,7 @@ function ImportList({ onNew, onView }) {
 //  MAIN EXPORT
 // ════════════════════════════════════════════════════════
 export function StockImportPage({ currentUser, warehouseId, warehouseName }) {
+  // warehouse_ids filter đã xử lý ở WarehouseApp — nhận qua props
   const [view, setView] = useState("list"); // "list" | "form"
 
   function handleSaved(status) {

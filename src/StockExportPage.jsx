@@ -443,10 +443,15 @@ export function StockExportPage({ currentUser, warehouseId, warehouseName }) {
     setLoading(true);
     try {
       const all = await StockExportRequest.list({ limit: 300 });
-      setReqs(all);
+      // Filter theo warehouse_ids của user (rỗng = thấy tất cả)
+      const ids = currentUser?.warehouse_ids || [];
+      const filtered = ids.length > 0
+        ? all.filter(r => !r.warehouse_id || ids.includes(r.warehouse_id))
+        : all;
+      setReqs(filtered);
     } catch { setReqs([]); }
     setLoading(false);
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => { load(); }, [load]);
 
