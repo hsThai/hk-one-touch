@@ -4,6 +4,7 @@ import { Warehouse } from "./pb.js";
 import { StockLedgerPage } from "./StockLedgerPage.jsx";
 import { StockImportPage } from "./StockImportPage.jsx";
 import { StockExportPage } from "./StockExportPage.jsx";
+import { StockTransferPage } from "./StockTransferPage.jsx";
 
 const PRIMARY   = "#3730a3";
 const LIGHT     = "#ede9fe";
@@ -154,7 +155,12 @@ export function WarehouseApp({ currentUser, onBack }) {
           />
         );
       case "transfer":
-        return <ComingSoon icon="🔀" label="Chuyển kho" />;
+        return (
+          <StockTransferPage
+            currentUser={currentUser}
+            allWarehouses={warehouses}
+          />
+        );
       default:
         return null;
     }
